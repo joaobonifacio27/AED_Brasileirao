@@ -1,0 +1,893 @@
+---
+title: "Analise Exploratória da Série A do Campeonato Brasileiro de Futebol"
+author: "João Paulo Bonifácio"
+date: "19/06/2024" 
+format: 
+  html:
+    theme: lux # Tema do HTML
+    embed-resources: true # Compiçaõ do CSS
+    smooth-scroll: true # Scroll suave
+    citations-hover: true # Citações
+    footnotes-hover: true # Notas de rodapé
+    crossrefs-hover: true # Referências cruzadas
+    toc: true # Sumário
+    toc-depth: 2 # Profundidade do sumário
+    toc-title: Sumário # Título do sumário
+    other-links:
+      - text: FBRREF
+        href: https://fbref.com
+      - text: R Project
+        href: https://www.r-project.org/
+      - text: Tidyverse
+        href: https://www.tidyverse.org/
+      - text: Rvest
+        href: https://rvest.tidyverse.org/
+editor: source 
+output: html_document
+alignment: justify
+---
+
+```{r, Bibliotecas, message=FALSE, warning=FALSE, echo=FALSE}
+library(tidyverse)
+library(knitr)
+library(skimr)
+library(ggplot2)
+library(kableExtra)
+library(DT)
+library(htmltools)
+library(here)
+library(grid)
+library(gridExtra)
+library(corrplot)
+```
+
+```{r, Base de Dados, echo=FALSE, message=FALSE, warning=FALSE}
+br_23 <- read_csv("Base de dados/br_2023.csv")
+br_22 <- read_csv("Base de dados/br_2022.csv")
+br_21 <- read_csv("Base de dados/br_2021.csv")
+br_20 <- read_csv("Base de dados/br_2020.csv")
+br_19 <- read_csv("Base de dados/br_2019.csv")
+br_18 <- read_csv("Base de dados/br_2018.csv")
+br_17 <- read_csv("Base de dados/br_2017.csv")
+br_16 <- read_csv("Base de dados/br_2016.csv")
+br_15 <- read_csv("Base de dados/br_2015.csv")
+br_14 <- read_csv("Base de dados/br_2014.csv")
+br_23_e <- read_csv("Base de dados/br_23_e.csv")
+br_22_e <- read_csv("Base de dados/br_22_e.csv")
+br_21_e <- read_csv("Base de dados/br_21_e.csv")
+br_20_e <- read_csv("Base de dados/br_20_e.csv")
+br_19_e <- read_csv("Base de dados/br_19_e.csv")
+br_18_e <- read_csv("Base de dados/br_18_e.csv")
+br_17_e <- read_csv("Base de dados/br_17_e.csv")
+br_16_e <- read_csv("Base de dados/br_16_e.csv")
+br_15_e <- read_csv("Base de dados/br_15_e.csv")
+br_14_e <- read_csv("Base de dados/br_14_e.csv")
+br_23_e_2 <- read_csv("Base de dados/br_23_e_2.csv")
+br_22_e_2 <- read_csv("Base de dados/br_22_e_2.csv")
+br_21_e_2 <- read_csv("Base de dados/br_21_e_2.csv")
+br_20_e_2 <- read_csv("Base de dados/br_20_e_2.csv")
+br_19_e_2 <- read_csv("Base de dados/br_19_e_2.csv")
+br_18_e_2 <- read_csv("Base de dados/br_18_e_2.csv")
+br_17_e_2 <- read_csv("Base de dados/br_17_e_2.csv")
+br_16_e_2 <- read_csv("Base de dados/br_16_e_2.csv")
+br_15_e_2 <- read_csv("Base de dados/br_15_e_2.csv")
+br_14_e_2 <- read_csv("Base de dados/br_14_e_2.csv")
+
+```
+
+```{r, Renomear, echo=FALSE, message=FALSE, warning=FALSE}
+
+br_23 <- br_23 |> rename("Classificação" = X1) |>
+                      rename("Time" = X2) |>
+                      rename("Jogos Disputados" = X3) |>
+                      rename("Vitórias" = X4) |>
+                      rename("Empates" = X5) |>
+                      rename("Derrotas" = X6) |>
+                      rename("Gols Marcados" = X7) |>
+                      rename("Gols Sofridos" = X8) |>
+                      rename("Saldo de Gols" = X9) |>
+                      rename("Pontos" = X10) |>
+                      rename("Pontos por Partida" = X11) |>
+                      rename("Gols Previstos" = X12) |>
+                      rename("Gols Previstos Sofridos" = X13) |>
+                      rename("Gols Previstos Diferença" = X14) |>
+                      rename("Gols Previstos Diferença 90" = X15) |>
+                      rename("Média de Publico" = X16) |>
+                      rename("Artilhero da Equipe" = X17)|>
+                      rename("Goleiros" = X18) |>
+                      rename("Notas" = X19)
+
+br_22 <- br_22 |> rename("Classificação" = X1) |>
+                      rename("Time" = X2) |>
+                      rename("Jogos Disputados" = X3) |>
+                      rename("Vitórias" = X4) |>
+                      rename("Empates" = X5) |>
+                      rename("Derrotas" = X6) |>
+                      rename("Gols Marcados" = X7) |>
+                      rename("Gols Sofridos" = X8) |>
+                      rename("Saldo de Gols" = X9) |>
+                      rename("Pontos" = X10) |>
+                      rename("Pontos por Partida" = X11) |>
+                      rename("Gols Previstos" = X12) |>
+                      rename("Gols Previstos Sofridos" = X13) |>
+                      rename("Gols Previstos Diferença" = X14) |>
+                      rename("Gols Previstos Diferença 90" = X15) |>
+                      rename("Média de Publico" = X16) |>
+                      rename("Artilhero da Equipe" = X17)|>
+                      rename("Goleiros" = X18) |>
+                      rename("Notas" = X19)
+
+br_21 <- br_21 |> rename("Classificação" = X1) |>
+                      rename("Time" = X2) |>
+                      rename("Jogos Disputados" = X3) |>
+                      rename("Vitórias" = X4) |>
+                      rename("Empates" = X5) |>
+                      rename("Derrotas" = X6) |>
+                      rename("Gols Marcados" = X7) |>
+                      rename("Gols Sofridos" = X8) |>
+                      rename("Saldo de Gols" = X9) |>
+                      rename("Pontos" = X10) |>
+                      rename("Pontos por Partida" = X11) |>
+                      rename("Gols Previstos" = X12) |>
+                      rename("Gols Previstos Sofridos" = X13) |>
+                      rename("Gols Previstos Diferença" = X14) |>
+                      rename("Gols Previstos Diferença 90" = X15) |>
+                      rename("Média de Publico" = X16) |>
+                      rename("Artilhero da Equipe" = X17)|>
+                      rename("Goleiros" = X18) |>
+                      rename("Notas" = X19)
+
+br_20 <- br_20 |> rename("Classificação" = X1) |>
+                    rename("Time" = X2) |>
+                    rename("Jogos Disputados" = X3) |> 
+                    rename("Vitorias"= X4) |> 
+                    rename("Empates" = X5) |> 
+                    rename("Derrotas" = X6) |> 
+                    rename("Gols Marcados" = X7) |> 
+                    rename("Gols Sofridos" = X8) |> 
+                    rename("Saldo de Gols" = X9) |> 
+                    rename("Pontos" = X10) |> 
+                    rename("Pontos por Partida" = X11) |> 
+                    rename("Gols Previstos" = X12) |> 
+                    rename("Gols Previstos Sofridos" = X13) |> 
+                    rename("Gols Previstos Diferença" = X14) |> 
+                    rename("Gols Previstos Diferença 90" = X15) |> 
+                    rename("Ultimos 5 Jogos" = X16) |> 
+                    rename("Artilheiro da Equipe" = X17) |> 
+                    rename("Goleiros" = X18) |> 
+                    rename("Notas" = X19)
+
+br_19 <- br_19 |> rename("Classificação" = X1) |>
+                  rename("Time" = X2) |>
+                  rename("Jogos Disputados" = X3) |>
+                  rename("Vitórias" = X4) |>
+                  rename("Empates" = X5) |>
+                  rename("Derrotas" = X6) |>
+                  rename("Gols Marcados" = X7) |>
+                  rename("Gols Sofridos" = X8) |>
+                  rename("Saldo de Gols" = X9) |>
+                  rename("Pontos" = X10) |>
+                  rename("Pontos por Partida" = X11) |>
+                  rename("Gols Previstos" = X12) |>
+                  rename("Gols Previstos Sofridos" = X13) |>
+                  rename("Gols Previstos Diferença" = X14) |>
+                  rename("Gols Previstos Diferença 90" = X15) |>
+                  rename("Média de Publico" = X16) |>
+                  rename("Artilhero da Equipe" = X17)|>
+                  rename("Goleiros" = X18) |>
+                  rename("Notas" = X19)
+
+br_18 <- br_18 |> rename("Classificação" = X1) |>
+                  rename("Time" = X2) |>
+                  rename("Jogos Disputados" = X3) |>
+                  rename("Vitórias" = X4) |>
+                  rename("Empates" = X5) |>
+                  rename("Derrotas" = X6) |>
+                  rename("Gols Marcados" = X7) |>
+                  rename("Gols Sofridos" = X8) |>
+                  rename("Saldo de Gols" = X9) |>
+                  rename("Pontos" = X10) |>
+                  rename("Pontos por Partida" = X11) |>
+                  rename("Público" = X12) |>
+                  rename("Artilheiro" = X13) |>
+                  rename("Goleiros" = X14) |>
+                  rename("Notas" = X15)
+
+br_17 <- br_17 |> rename("Classificação" = X1) |>
+                  rename("Time" = X2) |>
+                  rename("Jogos Disputados" = X3) |>
+                  rename("Vitórias" = X4) |>
+                  rename("Empates" = X5) |>
+                  rename("Derrotas" = X6) |>
+                  rename("Gols Marcados" = X7) |>
+                  rename("Gols Sofridos" = X8) |>
+                  rename("Saldo de Gols" = X9) |>
+                  rename("Pontos" = X10) |>
+                  rename("Pontos por Partida" = X11) |>
+                  rename("Público" = X12) |>
+                  rename("Artilheiro" = X13) |>
+                  rename("Goleiros" = X14) |>
+                  rename("Notas" = X15)
+
+br_16 <- br_16 |> rename("Classificação" = X1) |>
+                  rename("Time" = X2) |>
+                  rename("Jogos Disputados" = X3) |>
+                  rename("Vitórias" = X4) |>
+                  rename("Empates" = X5) |>
+                  rename("Derrotas" = X6) |>
+                  rename("Gols Marcados" = X7) |>
+                  rename("Gols Sofridos" = X8) |>
+                  rename("Saldo de Gols" = X9) |>
+                  rename("Pontos" = X10) |>
+                  rename("Pontos por Partida" = X11) |>
+                  rename("Público" = X12) |>
+                  rename("Artilheiro" = X13) |>
+                  rename("Goleiros" = X14) |>
+                  rename("Notas" = X15)
+
+br_15 <- br_15 |> rename("Classificação" = X1) |>
+                  rename("Time" = X2) |>
+                  rename("Jogos Disputados" = X3) |>
+                  rename("Vitórias" = X4) |>
+                  rename("Empates" = X5) |>
+                  rename("Derrotas" = X6) |>
+                  rename("Gols Marcados" = X7) |>
+                  rename("Gols Sofridos" = X8) |>
+                  rename("Saldo de Gols" = X9) |>
+                  rename("Pontos" = X10) |>
+                  rename("Pontos por Partida" = X11) |>
+                  rename("Público" = X12) |>
+                  rename("Artilheiro" = X13) |>
+                  rename("Goleiros" = X14) |>
+                  rename("Notas" = X15)
+
+br_14 <- br_14 |> rename("Classificação" = X1) |>
+                  rename("Time" = X2) |>
+                  rename("Jogos Disputados" = X3) |>
+                  rename("Vitórias" = X4) |>
+                  rename("Empates" = X5) |>
+                  rename("Derrotas" = X6) |>
+                  rename("Gols Marcados" = X7) |>
+                  rename("Gols Sofridos" = X8) |>
+                  rename("Saldo de Gols" = X9) |>
+                  rename("Pontos" = X10) |>
+                  rename("Pontos por Partida" = X11) |>
+                  rename("Público" = X12) |>
+                  rename("Artilheiro" = X13) |>
+                  rename("Goleiros" = X14) |>
+                  rename("Notas" = X15)
+```
+
+```{r, Estatisticas, echo=FALSE, message=FALSE, warning=FALSE}
+media_idade_geral <- mean(c(mean(br_23_e$'# J'), mean(br_22_e$'# J'), mean(br_21_e$'# J'), mean(br_20_e$'# J'), mean(br_19_e$'# J'), mean(br_18_e$'# J'), mean(br_17_e$'# J'), mean(br_16_e$'# J'), mean(br_15_e$'# J'), mean(br_14_e$'# J')))
+
+maior_idade_geral <- max(c(max(br_23_e$'# J'), max(br_22_e$'# J'), max(br_21_e$'# J'), max(br_20_e$'# J'), max(br_19_e$'# J'), max(br_18_e$'# J'), max(br_17_e$'# J'), max(br_16_e$'# J'), max(br_15_e$'# J'), max(br_14_e$'# J')))
+
+menor_idade_geral <- min(c(min(br_23_e$'# J'), min(br_22_e$'# J'), min(br_21_e$'# J'), min(br_20_e$'# J'), min(br_19_e$'# J'), min(br_18_e$'# J'), min(br_17_e$'# J'), min(br_16_e$'# J'), min(br_15_e$'# J'), min(br_14_e$'# J')))
+
+menor_numero_CA <- min(c(min(br_23_e$CrtsA), min(br_22_e$CrtsA), min(br_21_e$CrtsA), min(br_20_e$CrtsA), min(br_19_e$CrtsA), min(br_18_e$CrtsA), min(br_17_e$CrtsA), min(br_16_e$CrtsA), min(br_15_e$CrtsA), min(br_14_e$CrtsA)))
+
+maior_numero_CA <- max(c(max(br_23_e$CrtsA), max(br_22_e$CrtsA), max(br_21_e$CrtsA), max(br_20_e$CrtsA), max(br_19_e$CrtsA), max(br_18_e$CrtsA), max(br_17_e$CrtsA), max(br_16_e$CrtsA), max(br_15_e$CrtsA), max(br_14_e$CrtsA)))
+
+menor_numero_CV <- min(c(min(br_23_e$CrtV), min(br_22_e$CrtV), min(br_21_e$CrtV), min(br_20_e$CrtV), min(br_19_e$CrtV), min(br_18_e$CrtV), min(br_17_e$CrtV), min(br_16_e$CrtV), min(br_15_e$CrtV), min(br_14_e$CrtV)))
+
+maior_numero_CV <- max(c(max(br_23_e$CrtV), max(br_22_e$CrtV), max(br_21_e$CrtV), max(br_20_e$CrtV), max(br_19_e$CrtV), max(br_18_e$CrtV), max(br_17_e$CrtV), max(br_16_e$CrtV), max(br_15_e$CrtV), max(br_14_e$CrtV)))
+
+media_posse_geral <- mean(c(mean(br_23_e$Posse), mean(br_22_e$Posse), mean(br_21_e$Posse), mean(br_20_e$Posse), mean(br_19_e$Posse), mean(br_18_e$Posse), mean(br_17_e$Posse), mean(br_16_e$Posse), mean(br_15_e$Posse)))
+
+media_amarelos_geral <- mean(na.omit(c(mean(br_23_e$"CrtsA"), mean(br_22_e$"CrtsA"), mean(br_21_e$"CrtsA"), mean(br_20_e$"CrtsA"), mean(br_19_e$"CrtsA"), mean(br_18_e$"CrtsA"), mean(br_17_e$"CrtsA"), mean(br_16_e$"CrtsA"), mean(br_15_e$"CrtsA"), mean(br_14_e$"CrtsA"))))
+                             
+media_vermelhos_geral <- mean(na.omit(c(mean(br_23_e$"CrtV"), mean(br_22_e$"CrtV"), mean(br_21_e$"CrtV"), mean(br_20_e$"CrtV"), mean(br_19_e$"CrtV"), mean(br_18_e$"CrtV"), mean(br_17_e$"CrtV"), mean(br_16_e$"CrtV"), mean(br_15_e$"CrtV"), mean(br_14_e$"CrtV"))))
+
+# soma_ca_g4 <- sum(na.omit(times_g4$"amarelos"))
+# 
+# soma_ca_z4 <- sum(na.omit(times_z4$"amarelos"))
+# 
+# soma_cv_g4 <- sum(na.omit(times_g4$"vermelhos"))
+# 
+# soma_cv_z4 <- sum(na.omit(times_z4$"vermelhos"))
+  
+# # time com maior numero de gols marcados por temporada
+# posse_gols |> filter(gols == max(gols))
+# # time com maior assistências
+# posse_assistencias |> filter(assistencias == max(assistencias))
+# # time com maior posse de bola
+# posse_gols |> filter(posse == max(posse))
+# # menor posse de bola e melhor posição
+# posse_posicao |> filter(posicao==5) |> filter(posse == min(posse))
+# posse_pontos |> filter (pontos == max(pontos))
+```
+
+# Introdução
+
+::: {style="text-align: justify"}
+Este seguinte trabalho tem como objetivo fazer uma analise exploratorioa usando dados sobre a Série A do Campeonato Brasileiro de Futebol. O recorte temporal escolhido é de 2014 a 2023, abrangendo 10 anos de competição e contendo 200 observaçoes e 36 variaveis. A base de dados foi retirada do site [FBREF](https://fbref.com) e contem as principais informações sobre a campanha anual dos times participantes da competição.
+
+Os Dados foram coletados através de web scraping usando o pacote `rvest` e posteriormente tratados e organizados no software R. O site supracitado permite a extração de dados com algumas limitações. A documentação, assim como a fonte dos dados do site, podem ser acessadas no seguinte [link](https://www.sports-reference.com/bot-traffic.html).
+
+Para o tratamento e organização dos dados, foram utilizados os pacotes presentes na coleção do `tidyverse`, principalmente o `dplyr`. Para a visualização, foram utilizados os pacotes `ggplot2` e `kableExtra`.
+
+A analise esta dividida em em três partes. Na primeira é feito um levantamento a respeito da quantidade de cartões amarelos e vermelhos recebidos pelos times antes e após a implementação do VAR (Video Assistant Referee). Na segunda parte, é feita uma analise dos times vencedores, dos quatro melhores colocados e dos rebaixados, buscando um padrão entre eles. Na terceira se mede a correlação de algumas estatisticas presentes na base de dado escolhida. 
+
+:::
+
+# Cartões Amarelos e Vermelhos Antes e Após o VAR
+
+::: {style="text-align: justify"}
+
+O árbitro de vídeo (VAR) foi introduzido no Campeonato Brasileiro em 2019 com o objetivo de aumentar a precisão das decisões arbitrais e reduzir erros cruciais durante as partidas. Esta tecnologia permite que árbitros revisem lances controversos com o auxílio de câmeras e replays, podendo influenciar diretamente na aplicação de cartões amarelos e vermelhos. Vamos analisar a distribuição do acumulo por temporada de cartões amarelos e vermelhos recebidos pelos times, antes e depois da introdução do VAR.
+
+```{r, dataframe cartões, echo=FALSE, message=FALSE, warning=FALSE}
+#Dataframes
+CA_AV = data.frame(t(rbind(c(br_18_e$CrtsA, br_17_e$CrtsA, br_16_e$CrtsA, br_15_e$CrtsA, br_14_e$CrtsA))))
+CV_AV = data.frame(t(rbind(c(br_18_e$CrtV, br_17_e$CrtV, br_16_e$CrtV, br_15_e$CrtV, br_14_e$CrtV))))
+CA_PV = data.frame(t(rbind(c(br_23_e$CrtsA, br_22_e$CrtsA, br_21_e$CrtsA, br_20_e$CrtsA, br_19_e$CrtsA))))
+CV_PV = data.frame(t(rbind(c(br_23_e$CrtV, br_22_e$CrtV, br_21_e$CrtV, br_20_e$CrtV, br_19_e$CrtV))))
+CA_AV <- CA_AV |> rename("V1" = t.rbind.c.br_18_e.CrtsA..br_17_e.CrtsA..br_16_e.CrtsA..br_15_e.CrtsA..)
+CV_AV <- CV_AV |> rename("V1" = t.rbind.c.br_18_e.CrtV..br_17_e.CrtV..br_16_e.CrtV..br_15_e.CrtV..)
+CA_PV <- CA_PV |> rename("V1" = t.rbind.c.br_23_e.CrtsA..br_22_e.CrtsA..br_21_e.CrtsA..br_20_e.CrtsA..)
+CV_PV <- CV_PV |> rename("V1" = t.rbind.c.br_23_e.CrtV..br_22_e.CrtV..br_21_e.CrtV..br_20_e.CrtV..)
+```
+
+```{r, Histogramas Cartões, echo=FALSE, message=FALSE, warning=FALSE}
+h1 <- ggplot(CA_AV, aes(x = V1)) +
+  geom_histogram(aes(y = ..density..), binwidth = 7.5, fill = "skyblue", color = "black") +
+  geom_density(color = "orangered", size = 1, adjust = 1) +
+  geom_vline(xintercept = mean(CA_AV$V1), color = "red", linetype = "dashed") +
+  scale_x_continuous(limits = c(50, 130)) +
+  labs(title = "Cartões Amarelos Antes do VAR", 
+       x = "Cartões Amarelos", 
+       y = "Densidade") +
+  theme_minimal()
+h2 <- ggplot(CV_AV, aes(x = V1)) +
+  geom_histogram(aes(y = ..density..), binwidth = 1, fill = "skyblue", color = "black") +
+  geom_density(color = "orangered", size = 1, adjust = 1) +
+  geom_vline(xintercept = mean(CV_AV$V1), color = "red", linetype = "dashed") +
+  scale_x_continuous(limits = c(min(CV_PV), max(CV_PV))) +
+  labs(title = "Cartões Vermelhos Antes do VAR", 
+       x = "Cartões Vermelhos", 
+       y = "Densidade") +
+  theme_minimal()
+h3 <- ggplot(CA_PV, aes(x = V1)) +
+  geom_histogram(aes(y = ..density..), binwidth = 7.5, fill = "skyblue", color = "black") +
+  geom_density(color = "orangered", size = 1, adjust = 1) +
+  scale_x_continuous(limits = c(50, 130)) +
+  geom_vline(xintercept = mean(CA_PV$V1), color = "red", linetype = "dashed") +
+  labs(title = "Cartões Amarelos Pós VAR", 
+       x = "Cartões Amarelos", 
+       y = "Densidade") +
+  theme_minimal()
+h4 <- ggplot(CV_PV, aes(x = V1)) +
+  geom_histogram(aes(y = ..density..), binwidth = 1, fill = "skyblue", color = "black") +
+  geom_density(color = "orangered", size = 1, adjust = 1) +
+  scale_x_continuous(limits = c(min(CV_PV), max(CV_PV))) +
+  geom_vline(xintercept = mean(CV_PV$V1), color = "red", linetype = "dashed") +
+  labs(title = "Cartões Vermelhos Pós VAR", 
+       x = "Cartões Vermelhos", 
+       y = "Densidade") +
+  theme_minimal()
+
+
+grid.arrange(h1, h2, h3, h4, nrow = 2, ncol = 2)
+
+```
+
+Nota-se que, em média, a quantidade de cartões, tanto amarelos quanto vermelhos, recebidos por equipe ao longo dos anos não sofreu alterações significativas após a implementação do VAR. O gráfico a seguir representa a média de cartões amarelos e vermelhos recebidos por equipe antes e após a implementação do VAR, acompanhado de seus seguintes desvios padrões.
+
+```{r, Desvio Padrão Cartões, echo=FALSE, message=FALSE, warning=FALSE}
+tabela_cartoes_amarelos <- tibble(
+  VAR = c("Antes do VAR", "Após o VAR"),
+  Media = c(mean(CA_AV$V1), mean(CA_PV$V1)),
+  SD = c(sd(CA_AV$V1), sd(CA_PV$V1))
+)
+
+# Dados para os cartões vermelhos
+tabela_cartoes_vermelhos <- tibble(
+  VAR = c("Antes do VAR", "Após o VAR"),
+  Media = c(mean(CV_AV$V1), mean(CV_PV$V1)),
+  SD = c(sd(CV_AV$V1), sd(CV_PV$V1))
+)
+
+# Gráfico de pontos para os cartões amarelos
+grafico_amarelos <- ggplot(tabela_cartoes_amarelos, aes(x = VAR, y = Media, color = VAR)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = Media - (SD), ymax = Media + (SD)), width = 0.2) +
+  labs(title = "Média de Cartões Amarelos", x = "VAR", y = "Média") +
+  ylim(0,110)+
+  theme_minimal()+
+  # Ocultar legenda
+  theme(legend.position = "none")
+
+# Gráfico de pontos para os cartões vermelhos
+grafico_vermelhos <- ggplot(tabela_cartoes_vermelhos, aes(x = VAR, y = Media, color = VAR)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = Media - SD, ymax = Media + SD), width = 0.2) +
+  labs(title = "Média de Cartões Vermelhos", x = "VAR", y = "Média") +
+  ylim(0, 13) +
+  theme_minimal()+
+  theme(legend.position = "none")
+
+grid.arrange(grafico_amarelos, grafico_vermelhos, nrow = 1, ncol = 2 )
+
+```
+
+Contudo, ao observar a quantidade absoluta de cartões, percebe-se uma diminuição na quantidade de cartões amarelos e um aumento na quantidade de cartões vermelhos. A tabela abaixo apresenta a frequência de cartões amarelos e vermelhos antes e após a implementação do VAR.
+
+```{r, Tabela Cartões, echo=FALSE, message=FALSE, warning=FALSE}
+tabela_cartoes <- tibble(
+  "Cartões" = c("Amarelos", "Vermelhos", "Total"),
+  "Antes do VAR" = c(sum(CA_AV$V1), sum(CV_AV$V1), sum(CA_AV$V1)+sum(CV_AV$V1)),
+  "Após o VAR" = c(sum(CA_PV$V1), sum(CV_PV$V1), sum(CA_PV$V1)+sum(CV_PV$V1)),
+"Totais" = c((sum(CA_AV$V1)+sum(CA_PV$V1)), (sum(CV_AV$V1)+sum(CV_PV$V1)), sum(CA_AV$V1)+sum(CA_PV)+sum(CV_AV$V1)+sum(CV_PV)))
+kable(tabela_cartoes)
+```
+
+A diferença apresentada pode ser explicada pelo fato de que, com a chegada do VAR, criou-se uma nova regra que permite ao juiz, após revisão, cancelar um cartão amarelo e apresentar um cartão vermelho diretamente, caso julgue necessário. Contudo, para uma análise mais aprofundada deste caso, seria necessário analisar as expulsões diretas (por cartões vermelhos) e as expulsões indiretas (por acúmulo de cartões amarelos). No entanto, essa informação só foi adicionada à base de dados a partir de 2019, o que impossibilita uma análise mais detalhada sobre o tema.
+
+:::
+
+# Estatisticas dos Times Vencedores, Quatro Melhores e Rebaixados
+::: {style="text-align: justify"}
+Explorando os dados, podemos fazer alguns comparativos entre os times vencedores de cada ano, afim de buscar um padrão. Além disso, podemos comparar as estatisticas dos quatro melhores colocados (G4) e comparar com os rebaixados (Z4).
+
+```{r, DF G1, echo=FALSE, message=FALSE, warning=FALSE}
+# df dos times vitoriosos por ano
+campeoes_por_ano <- tibble(
+  Ano_campeao = c(2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014),
+  Time_campeao = c( br_23$Time[1], br_22$Time[1], br_21$Time[1], br_20$Time[1], br_19$Time[1], br_18$Time[1], br_17$Time[1], br_16$Time[1], br_15$Time[1], br_14$Time[1])
+)
+```
+
+```{r, DF G4, echo=FALSE, message=FALSE, warning=FALSE}
+# df dos times quatro melhores times por ano
+estatisticas_G4 <- tibble(
+  ano = c(rep(2023, 4), rep(2022, 4), rep(2021, 4), rep(2020, 4), rep(2019, 4), rep(2018, 4), rep(2017, 4), rep(2016, 4), rep(2015, 4), rep(2014, 4)),
+  time = c(br_23$Time[1], br_23$Time[2], br_23$Time[3], br_23$Time[4], br_22$Time[1], br_22$Time[2], br_22$Time[3], br_22$Time[4], br_21$Time[1], br_21$Time[2], br_21$Time[3], br_21$Time[4], br_20$Time[1], br_20$Time[2], br_20$Time[3], br_20$Time[4], br_19$Time[1], br_19$Time[2], br_19$Time[3], br_19$Time[4], br_18$Time[1], br_18$Time[2], br_18$Time[3], br_18$Time[4], br_17$Time[1], br_17$Time[2], br_17$Time[3], br_17$Time[4], br_16$Time[1], br_16$Time[2], br_16$Time[3], br_16$Time[4], br_15$Time[1], br_15$Time[2], br_15$Time[3], br_15$Time[4], br_14$Time[1], br_14$Time[2], br_14$Time[3], br_14$Time[4]),
+  posse = c(br_23_e$Posse[1], br_23_e$Posse[2], br_23_e$Posse[3], br_23_e$Posse[4], br_22_e$Posse[1], br_22_e$Posse[2], br_22_e$Posse[3], br_22_e$Posse[4], br_21_e$Posse[1], br_21_e$Posse[2], br_21_e$Posse[3], br_21_e$Posse[4], br_20_e$Posse[1], br_20_e$Posse[2], br_20_e$Posse[3], br_20_e$Posse[4], br_19_e$Posse[1], br_19_e$Posse[2], br_19_e$Posse[3], br_19_e$Posse[4], br_18_e$Posse[1], br_18_e$Posse[2], br_18_e$Posse[3], br_18_e$Posse[4], br_17_e$Posse[1], br_17_e$Posse[2], br_17_e$Posse[3], br_17_e$Posse[4], br_16_e$Posse[1], br_16_e$Posse[2], br_16_e$Posse[3], br_16_e$Posse[4], br_15_e$Posse[1], br_15_e$Posse[2], br_15_e$Posse[3], br_15_e$Posse[4], br_14_e$Posse[1], br_14_e$Posse[2], br_14_e$Posse[3], br_14_e$Posse[4]),
+  idade = c(br_23_e$'# J'[1], br_23_e$'# J'[2], br_23_e$'# J'[3], br_23_e$'# J'[4], br_22_e$'# J'[1], br_22_e$'# J'[2], br_22_e$'# J'[3], br_22_e$'# J'[4], br_21_e$'# J'[1], br_21_e$'# J'[2], br_21_e$'# J'[3], br_21_e$'# J'[4], br_20_e$'# J'[1], br_20_e$'# J'[2], br_20_e$'# J'[3], br_20_e$'# J'[4], br_19_e$'# J'[1], br_19_e$'# J'[2], br_19_e$'# J'[3], br_19_e$'# J'[4], br_18_e$'# J'[1], br_18_e$'# J'[2], br_18_e$'# J'[3], br_18_e$'# J'[4], br_17_e$'# J'[1], br_17_e$'# J'[2], br_17_e$'# J'[3], br_17_e$'# J'[4], br_16_e$'# J'[1], br_16_e$'# J'[2], br_16_e$'# J'[3], br_16_e$'# J'[4], br_15_e$'# J'[1], br_15_e$'# J'[2], br_15_e$'# J'[3], br_15_e$'# J'[4], br_14_e$'# J'[1], br_14_e$'# J'[2], br_14_e$'# J'[3], br_14_e$'# J'[4]),
+  amarelos = c(br_23_e$"CrtsA"[1], br_23_e$"CrtsA"[2], br_23_e$"CrtsA"[3], br_23_e$"CrtsA"[4], br_22_e$"CrtsA"[1], br_22_e$"CrtsA"[2], br_22_e$"CrtsA"[3], br_22_e$"CrtsA"[4], br_21_e$"CrtsA"[1], br_21_e$"CrtsA"[2], br_21_e$"CrtsA"[3], br_21_e$"CrtsA"[4], br_20_e$"CrtsA"[1], br_20_e$"CrtsA"[2], br_20_e$"CrtsA"[3], br_20_e$"CrtsA"[4], br_19_e$"CrtsA"[1], br_19_e$"CrtsA"[2], br_19_e$"CrtsA"[3], br_19_e$"CrtsA"[4], br_18_e$"CrtsA"[1], br_18_e$"CrtsA"[2], br_18_e$"CrtsA"[3], br_18_e$"CrtsA"[4], br_17_e$"CrtsA"[1], br_17_e$"CrtsA"[2], br_17_e$"CrtsA"[3], br_17_e$"CrtsA"[4], br_16_e$"CrtsA"[1], br_16_e$"CrtsA"[2], br_16_e$"CrtsA"[3], br_16_e$"CrtsA"[4], br_15_e$"CrtsA"[1], br_15_e$"CrtsA"[2], br_15_e$"CrtsA"[3], br_15_e$"CrtsA"[4], br_14_e$"CrtsA"[1], br_14_e$"CrtsA"[2], br_14_e$"CrtsA"[3], br_14_e$"CrtsA"[4]),
+  vermelhos = c(br_23_e$"CrtV"[1], br_23_e$"CrtV"[2], br_23_e$"CrtV"[3], br_23_e$"CrtV"[4], br_22_e$"CrtV"[1], br_22_e$"CrtV"[2], br_22_e$"CrtV"[3], br_22_e$"CrtV"[4], br_21_e$"CrtV"[1], br_21_e$"CrtV"[2], br_21_e$"CrtV"[3], br_21_e$"CrtV"[4], br_20_e$"CrtV"[1], br_20_e$"CrtV"[2], br_20_e$"CrtV"[3], br_20_e$"CrtV"[4], br_19_e$"CrtV"[1], br_19_e$"CrtV"[2], br_19_e$"CrtV"[3], br_19_e$"CrtV"[4], br_18_e$"CrtV"[1], br_18_e$"CrtV"[2], br_18_e$"CrtV"[3], br_18_e$"CrtV"[4], br_17_e$"CrtV"[1], br_17_e$"CrtV"[2], br_17_e$"CrtV"[3], br_17_e$"CrtV"[4], br_16_e$"CrtV"[1], br_16_e$"CrtV"[2], br_16_e$"CrtV"[3], br_16_e$"CrtV"[4], br_15_e$"CrtV"[1], br_15_e$"CrtV"[2], br_15_e$"CrtV"[3], br_15_e$"CrtV"[4], br_14_e$"CrtV"[1], br_14_e$"CrtV"[2], br_14_e$"CrtV"[3], br_14_e$"CrtV"[4])
+)
+```
+
+```{r, EST Z4, echo=FALSE, message=FALSE, warning=FALSE}
+# df dos times rebaixados por ano
+estatisticas_Z4 <- tibble(
+  ano = c(rep(2023, 4), rep(2022, 4), rep(2021, 4), rep(2020, 4), rep(2019, 4), rep(2018, 4), rep(2017, 4), rep(2016, 4), rep(2015, 4), rep(2014, 4)),
+  time = c(br_23$Time[17], br_23$Time[18], br_23$Time[19], br_23$Time[20], br_22$Time[17], br_22$Time[18], br_22$Time[19], br_22$Time[20], br_21$Time[17], br_21$Time[18], br_21$Time[19], br_21$Time[20], br_20$Time[17], br_20$Time[18], br_20$Time[19], br_20$Time[20], br_19$Time[17], br_19$Time[18], br_19$Time[19], br_19$Time[20], br_18$Time[17], br_18$Time[18], br_18$Time[19], br_18$Time[20], br_17$Time[17], br_17$Time[18], br_17$Time[19], br_17$Time[20], br_16$Time[17], br_16$Time[18], br_16$Time[19], br_16$Time[20], br_15$Time[17], br_15$Time[18], br_15$Time[19], br_15$Time[20], br_14$Time[17], br_14$Time[18], br_14$Time[19], br_14$Time[20]),
+  posse = c(br_23_e$Posse[17], br_23_e$Posse[18], br_23_e$Posse[19], br_23_e$Posse[20], br_22_e$Posse[17], br_22_e$Posse[18], br_22_e$Posse[19], br_22_e$Posse[20], br_21_e$Posse[17], br_21_e$Posse[18], br_21_e$Posse[19], br_21_e$Posse[20], br_20_e$Posse[17], br_20_e$Posse[18], br_20_e$Posse[19], br_20_e$Posse[20], br_19_e$Posse[17], br_19_e$Posse[18], br_19_e$Posse[19], br_19_e$Posse[20], br_18_e$Posse[17], br_18_e$Posse[18], br_18_e$Posse[19], br_18_e$Posse[20], br_17_e$Posse[17], br_17_e$Posse[18], br_17_e$Posse[19], br_17_e$Posse[20], br_16_e$Posse[17], br_16_e$Posse[18], br_16_e$Posse[19], br_16_e$Posse[20], br_15_e$Posse[17], br_15_e$Posse[18], br_15_e$Posse[19], br_15_e$Posse[20], br_14_e$Posse[17], br_14_e$Posse[18], br_14_e$Posse[19], br_14_e$Posse[20]),
+  idade = c(br_23_e$'# J'[17], br_23_e$'# J'[18], br_23_e$'# J'[19], br_23_e$'# J'[20], br_22_e$'# J'[17], br_22_e$'# J'[18], br_22_e$'# J'[19], br_22_e$'# J'[20], br_21_e$'# J'[17], br_21_e$'# J'[18], br_21_e$'# J'[19], br_21_e$'# J'[20], br_20_e$'# J'[17], br_20_e$'# J'[18], br_20_e$'# J'[19], br_20_e$'# J'[20], br_19_e$'# J'[17], br_19_e$'# J'[18], br_19_e$'# J'[19], br_19_e$'# J'[20], br_18_e$'# J'[17], br_18_e$'# J'[18], br_18_e$'# J'[19], br_18_e$'# J'[20], br_17_e$'# J'[17], br_17_e$'# J'[18], br_17_e$'# J'[19], br_17_e$'# J'[20], br_16_e$'# J'[17], br_16_e$'# J'[18], br_16_e$'# J'[19], br_16_e$'# J'[20], br_15_e$'# J'[17], br_15_e$'# J'[18], br_15_e$'# J'[19], br_15_e$'# J'[20], br_14_e$'# J'[17], br_14_e$'# J'[18], br_14_e$'# J'[19], br_14_e$'# J'[20]),
+  amarelos = c(br_23_e$"CrtsA"[17], br_23_e$"CrtsA"[18], br_23_e$"CrtsA"[19], br_23_e$"CrtsA"[20], br_22_e$"CrtsA"[17], br_22_e$"CrtsA"[18], br_22_e$"CrtsA"[19], br_22_e$"CrtsA"[20], br_21_e$"CrtsA"[17], br_21_e$"CrtsA"[18], br_21_e$"CrtsA"[19], br_21_e$"CrtsA"[20], br_20_e$"CrtsA"[17], br_20_e$"CrtsA"[18], br_20_e$"CrtsA"[19], br_20_e$"CrtsA"[20], br_19_e$"CrtsA"[17], br_19_e$"CrtsA"[18], br_19_e$"CrtsA"[19], br_19_e$"CrtsA"[20], br_18_e$"CrtsA"[17], br_18_e$"CrtsA"[18], br_18_e$"CrtsA"[19], br_18_e$"CrtsA"[20], br_17_e$"CrtsA"[17], br_17_e$"CrtsA"[18], br_17_e$"CrtsA"[19], br_17_e$"CrtsA"[20], br_16_e$"CrtsA"[17], br_16_e$"CrtsA"[18], br_16_e$"CrtsA"[19], br_16_e$"CrtsA"[20], br_15_e$"CrtsA"[17], br_15_e$"CrtsA"[18], br_15_e$"CrtsA"[19], br_15_e$"CrtsA"[20], br_14_e$"CrtsA"[17], br_14_e$"CrtsA"[18], br_14_e$"CrtsA"[19], br_14_e$"CrtsA"[20]),
+  vermelhos = c(br_23_e$"CrtV"[17], br_23_e$"CrtV"[18], br_23_e$"CrtV"[19], br_23_e$"CrtV"[20], br_22_e$"CrtV"[17], br_22_e$"CrtV"[18], br_22_e$"CrtV"[19], br_22_e$"CrtV"[20], br_21_e$"CrtV"[17], br_21_e$"CrtV"[18], br_21_e$"CrtV"[19], br_21_e$"CrtV"[20], br_20_e$"CrtV"[17], br_20_e$"CrtV"[18], br_20_e$"CrtV"[19], br_20_e$"CrtV"[20], br_19_e$"CrtV"[17], br_19_e$"CrtV"[18], br_19_e$"CrtV"[19], br_19_e$"CrtV"[20], br_18_e$"CrtV"[17], br_18_e$"CrtV"[18], br_18_e$"CrtV"[19], br_18_e$"CrtV"[20], br_17_e$"CrtV"[17], br_17_e$"CrtV"[18], br_17_e$"CrtV"[19], br_17_e$"CrtV"[20], br_16_e$"CrtV"[17], br_16_e$"CrtV"[18], br_16_e$"CrtV"[19], br_16_e$"CrtV"[20], br_15_e$"CrtV"[17], br_15_e$"CrtV"[18], br_15_e$"CrtV"[19], br_15_e$"CrtV"[20], br_14_e$"CrtV"[17], br_14_e$"CrtV"[18], br_14_e$"CrtV"[19], br_14_e$"CrtV"[20])
+)
+```
+
+```{r, EST G1, echo=FALSE, message=FALSE, warning=FALSE}
+# Tibble contendo as principais estatistcas dos campeões por ano
+estatisticas_vencedores <- tibble(
+  ano_posse = c(2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014),
+  Time_campeao_posse = campeoes_por_ano$Time_campeao,
+  posse_bola = c(br_23_e$Posse[which(br_23_e$Equipe == campeoes_por_ano$Time_campeao[1])],
+                  br_22_e$Posse[which(br_22_e$Equipe == campeoes_por_ano$Time_campeao[2])],
+                  br_21_e$Posse[which(br_21_e$Equipe == campeoes_por_ano$Time_campeao[3])],
+                  br_20_e$Posse[which(br_20_e$Equipe == campeoes_por_ano$Time_campeao[4])],
+                  br_19_e$Posse[which(br_19_e$Equipe == campeoes_por_ano$Time_campeao[5])],
+                  br_18_e$Posse[which(br_18_e$Equipe == campeoes_por_ano$Time_campeao[6])],
+                  br_17_e$Posse[which(br_17_e$Equipe == campeoes_por_ano$Time_campeao[7])],
+                  br_16_e$Posse[which(br_16_e$Equipe == campeoes_por_ano$Time_campeao[8])],
+                  br_15_e$Posse[which(br_15_e$Equipe == campeoes_por_ano$Time_campeao[9])],
+                  br_14_e$Posse[which(br_14_e$Equipe == campeoes_por_ano$Time_campeao[10])]),
+  idade_media_campeao = c(br_23_e$'# J'[which(br_23_e$Equipe == campeoes_por_ano$Time_campeao[1])],
+                          br_22_e$'# J'[which(br_22_e$Equipe == campeoes_por_ano$Time_campeao[2])],
+                          br_21_e$'# J'[which(br_21_e$Equipe == campeoes_por_ano$Time_campeao[3])],
+                          br_20_e$'# J'[which(br_20_e$Equipe == campeoes_por_ano$Time_campeao[4])],
+                          br_19_e$'# J'[which(br_19_e$Equipe == campeoes_por_ano$Time_campeao[5])],
+                          br_18_e$'# J'[which(br_18_e$Equipe == campeoes_por_ano$Time_campeao[6])],
+                          br_17_e$'# J'[which(br_17_e$Equipe == campeoes_por_ano$Time_campeao[7])],
+                          br_16_e$'# J'[which(br_16_e$Equipe == campeoes_por_ano$Time_campeao[8])],
+                          br_15_e$'# J'[which(br_15_e$Equipe == campeoes_por_ano$Time_campeao[9])],
+                          br_14_e$'# J'[which(br_14_e$Equipe == campeoes_por_ano$Time_campeao[10])]),
+  cartoes_amarelos_campeao = c(br_23_e$CrtsA[which(br_23_e$Equipe == campeoes_por_ano$Time_campeao[1])],
+                               br_22_e$CrtsA[which(br_22_e$Equipe == campeoes_por_ano$Time_campeao[2])],
+                               br_21_e$CrtsA[which(br_21_e$Equipe == campeoes_por_ano$Time_campeao[3])],
+                               br_20_e$CrtsA[which(br_20_e$Equipe == campeoes_por_ano$Time_campeao[4])],
+                               br_19_e$CrtsA[which(br_19_e$Equipe == campeoes_por_ano$Time_campeao[5])],
+                               br_18_e$CrtsA[which(br_18_e$Equipe == campeoes_por_ano$Time_campeao[6])],
+                               br_17_e$CrtsA[which(br_17_e$Equipe == campeoes_por_ano$Time_campeao[7])],
+                               br_16_e$CrtsA[which(br_16_e$Equipe == campeoes_por_ano$Time_campeao[8])],
+                               br_15_e$CrtsA[which(br_15_e$Equipe == campeoes_por_ano$Time_campeao[9])],
+                               br_14_e$CrtsA[which(br_14_e$Equipe == campeoes_por_ano$Time_campeao[10])]),
+
+  cartoes_vermelhos_campeoes = c(br_23_e$CrtV[which(br_23_e$Equipe == campeoes_por_ano$Time_campeao[1])],
+                                 br_22_e$CrtV[which(br_22_e$Equipe == campeoes_por_ano$Time_campeao[2])],
+                                 br_21_e$CrtV[which(br_21_e$Equipe == campeoes_por_ano$Time_campeao[3])],
+                                 br_20_e$CrtV[which(br_20_e$Equipe == campeoes_por_ano$Time_campeao[4])],
+                                 br_19_e$CrtV[which(br_19_e$Equipe == campeoes_por_ano$Time_campeao[5])],
+                                 br_18_e$CrtV[which(br_18_e$Equipe == campeoes_por_ano$Time_campeao[6])],
+                                 br_17_e$CrtV[which(br_17_e$Equipe == campeoes_por_ano$Time_campeao[7])],
+                                 br_16_e$CrtV[which(br_16_e$Equipe == campeoes_por_ano$Time_campeao[8])],
+                                 br_15_e$CrtV[which(br_15_e$Equipe == campeoes_por_ano$Time_campeao[9])],
+                                 br_14_e$CrtV[which(br_14_e$Equipe == campeoes_por_ano$Time_campeao[10])]
+  )
+)
+```
+
+::: panel-tabset
+### Campeões
+```{r, Campeões, echo=FALSE, message=FALSE, warning=FALSE}
+estatisticas_totais <- tibble(
+  posse = c(br_23_e$Posse, br_22_e$Posse, br_21_e$Posse, br_20_e$Posse, br_19_e$Posse, br_18_e$Posse, br_17_e$Posse, br_16_e$Posse, br_15_e$Posse, br_14_e$Posse),
+  idade = c(br_23_e$'# J', br_22_e$'# J', br_21_e$'# J', br_20_e$'# J', br_19_e$'# J', br_18_e$'# J', br_17_e$'# J', br_16_e$'# J', br_15_e$'# J', br_14_e$'# J'),
+  amarelos = c(br_23_e$CrtsA, br_22_e$CrtsA, br_21_e$CrtsA, br_20_e$CrtsA, br_19_e$CrtsA, br_18_e$CrtsA, br_17_e$CrtsA, br_16_e$CrtsA, br_15_e$CrtsA, br_14_e$CrtsA),
+  vermelhos = c(br_23_e$CrtV, br_22_e$CrtV, br_21_e$CrtV, br_20_e$CrtV, br_19_e$CrtV, br_18_e$CrtV, br_17_e$CrtV, br_16_e$CrtV, br_15_e$CrtV, br_14_e$CrtV)
+)
+
+```
+
+
+```{r, Graficos G1, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Criar quatro graficos de barras, um para cada estatistica dos campeões por ano
+g1 <- ggplot(estatisticas_vencedores, aes(x = ano_posse, y = posse_bola)) +
+  geom_bar(stat = "identity", fill = "skyblue2") +
+ # adicionar uma linha tracejada com a média geral, de todos os times
+  geom_abline(intercept = media_posse_geral, slope = 0, color = "orangered", linetype = "dashed", size = 1) +
+  geom_line(size = 0.8, color = "skyblue4") +
+  geom_point(size = 2, color = "skyblue4") +
+  labs(title = "Posse de Bola dos Campeões", x = "Ano", y = "Posse de Bola") +
+  theme_minimal()
+
+# Gráfico 2: idade_media_campeao
+g2 <- ggplot(estatisticas_vencedores, aes(x = ano_posse, y = idade_media_campeao)) +
+  geom_bar(stat = "identity", fill = "skyblue2") +
+  geom_abline(intercept = media_idade_geral, slope = 0, color = "orangered", linetype = "dashed", size = 1) +
+  geom_line(size = 0.8, color = "skyblue4") +
+  geom_point(size = 2, color = "skyblue4") +
+  labs(title = "Idade Média dos Campeões", x = "Ano", y = "Idade Média") +
+  theme_minimal()
+
+# Gráfico 3: cartoes_amarelos_campeao
+g3 <- ggplot(estatisticas_vencedores, aes(x = ano_posse, y = cartoes_amarelos_campeao)) +
+  geom_bar(stat = "identity", fill = "skyblue2") +
+  geom_abline(intercept = media_amarelos_geral, slope = 0, color = "orangered", linetype = "dashed", size = 1) +
+  geom_line(size = 0.8, color = "skyblue4") +
+  geom_point(size = 2, color = "skyblue4") +
+  labs(title = "Cartões Amarelos dos Campeões", x = "Ano", y = "Cartões Amarelos") +
+  theme_minimal()
+
+# Gráfico 4: cartoes_vermelhos_campeoes
+g4 <- ggplot(estatisticas_vencedores, aes(x = ano_posse, y = cartoes_vermelhos_campeoes)) +
+  geom_bar(stat = "identity", fill = "skyblue2") +
+  geom_abline(intercept = media_vermelhos_geral, slope = 0, color = "orangered", linetype = "dashed", size = 1) +
+  geom_line(size = 0.8, color = "skyblue4") +
+  geom_point(size = 2, color = "skyblue4") +
+  labs(title = "Cartões Vermelhos dos Campeões", x = "Ano", y = "Cartões Vermelhos") +
+  theme_minimal()
+
+# Organizando os gráficos em uma matriz 2x2
+grid.arrange(g1, g2, g3, g4, nrow = 2, ncol = 2)
+```
+
+Acima, temos quatro gráficos que comparam as estatísticas dos times campeões de cada ano. O primeiro gráfico mostra a posse de bola dos campeões, o segundo mostra a idade média dos jogadores, o terceiro mostra o número de cartões amarelos recebidos e o quarto mostra o número de cartões vermelhos recebidos. Em cada gráfico, a linha tracejada laranja representa a média geral de todas as equipes ao longo dos 10 anos analisados. Chama-se atenção para o fato de que os campeões costumam ter uma posse de bola acima da média, uma idade média dos jogadores abaixo da média, um número de cartões amarelos e vermelhos recebidos abaixo da média. Isso sugere que os times campeões costumam ter um estilo de jogo mais controlado e disciplinado.
+
+### G4
+
+```{r, DF G4_2, echo=FALSE, message=FALSE, warning=FALSE}
+# Tibble dos quatro melhores times por ano
+times_g4 <-  tibble (
+  indice = c(1:40),
+  ano = c(rep(2023, 4), rep(2022, 4), rep(2021, 4), rep(2020, 4), rep(2019, 4), rep(2018, 4), rep(2017, 4), rep(2016, 4), rep(2015, 4), rep(2014, 4)),
+  equipe = c(br_23$Time[1:4], br_22$Time[1:4], br_21$Time[1:4], br_20$Time[1:4], br_19$Time[1:4], br_18$Time[1:4], br_17$Time[1:4], br_16$Time[1:4], br_15$Time[1:4], br_14$Time[1:4]),
+  posse = c(br_23_e$Posse[1:4], br_22_e$Posse[1:4], br_21_e$Posse[1:4], br_20_e$Posse[1:4], br_19_e$Posse[1:4], br_18_e$Posse[1:4], br_17_e$Posse[1:4], br_16_e$Posse[1:4], br_15_e$Posse[1:4], br_14_e$Posse[1:4]),
+  idade = c(br_23_e$'# J'[1:4], br_22_e$'# J'[1:4], br_21_e$'# J'[1:4], br_20_e$'# J'[1:4], br_19_e$'# J'[1:4], br_18_e$'# J'[1:4], br_17_e$'# J'[1:4], br_16_e$'# J'[1:4], br_15_e$'# J'[1:4], br_14_e$'# J'[1:4]),
+  amarelos = c(br_23_e$"CrtsA"[1:4], br_22_e$"CrtsA"[1:4], br_21_e$"CrtsA"[1:4], br_20_e$"CrtsA"[1:4], br_19_e$"CrtsA"[1:4], br_18_e$"CrtsA"[1:4], br_17_e$"CrtsA"[1:4], br_16_e$"CrtsA"[1:4], br_15_e$"CrtsA"[1:4], br_14_e$"CrtsA"[1:4]),
+  vermelhos = c(br_23_e$"CrtV"[1:4], br_22_e$"CrtV"[1:4], br_21_e$"CrtV"[1:4], br_20_e$"CrtV"[1:4], br_19_e$"CrtV"[1:4], br_18_e$"CrtV"[1:4], br_17_e$"CrtV"[1:4], br_16_e$"CrtV"[1:4], br_15_e$"CrtV"[1:4], br_14_e$"CrtV"[1:4])
+)
+```
+
+```{r, Graficos G4, echo=FALSE, message=FALSE, warning=FALSE}
+g4_posse <- ggplot(times_g4, aes(x = posse)) +
+  geom_histogram(fill = "skyblue", color = "black", bins =10) +
+  labs(title = "Posse de Bola dos Times do G4", x = "Posse de Bola", y = "Frequência") +
+  geom_vline(xintercept = media_posse_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(40.2,61.6)+
+  ylim(0, 10)+
+  theme_minimal()
+
+g4_idade <- ggplot(times_g4, aes(x = idade)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 9) +
+  labs(title = "Idade dos Times do G4", x = "Idade", y = "Frequência") +
+  geom_vline(xintercept = media_idade_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(28,52)+
+  ylim(0,15)+
+  theme_minimal()
+
+g4_amarelos <- ggplot(times_g4, aes(x = amarelos)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 15) +
+  labs(title = "Cartões Amarelos dos Times do G4", x = "Cartões Amarelos", y = "Frequência") +
+  geom_vline(xintercept = media_amarelos_geral, color = "orangered", linetype = "dashed", size = 1)+
+  xlim(62,126)+
+  ylim(0,10)+
+  theme_minimal()
+
+g4_vermelhos <- ggplot(times_g4, aes(x = vermelhos)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 10) +
+  labs(title = "Cartões Vermelhos dos Times do G4", x = "Cartões Vermelhos", y = "Frequência") +
+  geom_vline(xintercept = media_vermelhos_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(0,14)+
+  ylim(0,15)+
+  theme_minimal()
+
+grid.arrange(g4_posse, g4_idade, g4_amarelos, g4_vermelhos, nrow = 2, ncol = 2)
+```
+
+Acima, temos quatro histogramas que apresentão as estatísticas dos times que ficaram no G4 (quatro primeiros colocados) de cada ano incluindo o campeão. O primeiro histograma mostra a posse de bola dos times, o segundo mostra a idade média dos jogadores, o terceiro mostra o número de cartões amarelos recebidos e o quarto mostra o número de cartões vermelhos recebidos. Em cada histograma, a linha tracejada laranja representa a média geral de todas as equipes ao longo dos 10 anos analisados. Em todos os casos existe assimetria em relação a média geral. Chama-se a atenção para fato dos times melhores colocados, terem, em sua maioria, times mais jovens.
+
+### Z4
+
+```{r, DF Z4_2, echo=FALSE, message=FALSE, warning=FALSE}
+times_z4 <-  tibble (
+  indice = c(1:40),
+  ano = c(rep(2023, 4), rep(2022, 4), rep(2021, 4), rep(2020, 4), rep(2019, 4), rep(2018, 4), rep(2017, 4), rep(2016, 4), rep(2015, 4), rep(2014, 4)),
+  equipe = c(br_23$Time[17:20], br_22$Time[17:20], br_21$Time[17:20], br_20$Time[17:20], br_19$Time[17:20], br_18$Time[17:20], br_17$Time[17:20], br_16$Time[17:20], br_15$Time[17:20], br_14$Time[17:20]),
+  posse = c(br_23_e$Posse[17:20], br_22_e$Posse[17:20], br_21_e$Posse[17:20], br_20_e$Posse[17:20], br_19_e$Posse[17:20], br_18_e$Posse[17:20], br_17_e$Posse[17:20], br_16_e$Posse[17:20], br_15_e$Posse[17:20], br_14_e$Posse[17:20]),
+  idade = c(br_23_e$'# J'[17:20], br_22_e$'# J'[17:20], br_21_e$'# J'[17:20], br_20_e$'# J'[17:20], br_19_e$'# J'[17:20], br_18_e$'# J'[17:20], br_17_e$'# J'[17:20], br_16_e$'# J'[17:20], br_15_e$'# J'[17:20], br_14_e$'# J'[17:20]),
+  amarelos = c(br_23_e$"CrtsA"[17:20], br_22_e$"CrtsA"[17:20], br_21_e$"CrtsA"[17:20], br_20_e$"CrtsA"[17:20], br_19_e$"CrtsA"[17:20], br_18_e$"CrtsA"[17:20], br_17_e$"CrtsA"[17:20], br_16_e$"CrtsA"[17:20], br_15_e$"CrtsA"[17:20], br_14_e$"CrtsA"[17:20]),
+  vermelhos = c(br_23_e$"CrtV"[17:20], br_22_e$"CrtV"[17:20], br_21_e$"CrtV"[17:20], br_20_e$"CrtV"[17:20], br_19_e$"CrtV"[17:20], br_18_e$"CrtV"[17:20], br_17_e$"CrtV"[17:20], br_16_e$"CrtV"[17:20], br_15_e$"CrtV"[17:20], br_14_e$"CrtV"[17:20])
+)
+```
+
+```{r, Graficos Z4, echo=FALSE, message=FALSE, warning=FALSE}
+# histograma da posse de bola dos times do Z4
+z4_posse <- ggplot(times_z4, aes(x = posse)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 10) +
+  labs(title = "Posse de Bola dos Times do Z4", x = "Posse de Bola", y = "Frequência") +
+  geom_vline(xintercept = media_posse_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(40.2,61.6)+
+  ylim(0, 10)+
+  theme_minimal()
+
+z4_idade <- ggplot(times_z4, aes(x = idade)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 9) +
+  labs(title = "Idade dos Times do Z4", x = "Idade", y = "Frequência") +
+  geom_vline(xintercept = media_idade_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(28,52)+
+  ylim(0,15)+
+  theme_minimal()
+
+z4_amarelos <- ggplot(times_z4, aes(x = amarelos)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 15) +
+  labs(title = "Cartões Amarelos dos Times do Z4", x = "Cartões Amarelos", y = "Frequência") +
+  geom_vline(xintercept = media_amarelos_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(62,126)+
+  ylim(0,10)+
+  theme_minimal()
+
+z4_vermelhos <- ggplot(times_z4, aes(x = vermelhos)) +
+  geom_histogram(fill = "skyblue", color = "black", bins = 10) +
+  labs(title = "Cartões Vermelhos dos Times do Z4", x = "Cartões Vermelhos", y = "Frequência") +
+  geom_vline(xintercept = media_vermelhos_geral, color = "orangered", linetype = "dashed", size = 1) +
+  xlim(0,14)+
+  ylim(0,15)+
+  theme_minimal()
+
+grid.arrange(z4_posse, z4_idade, z4_amarelos, z4_vermelhos, nrow = 2, ncol = 2)
+```
+
+Acima, temos quatro histogramas que apresentam as estatísticas dos times que ficaram no Z4 (quatro últimos colocados) de cada ano. O primeiro histograma mostra a posse de bola dos times, o segundo mostra a idade média dos jogadores, o terceiro mostra o número de cartões amarelos recebidos e o quarto mostra o número de cartões vermelhos recebidos. Em cada histograma, a linha tracejada laranja representa a média geral de todas as equipes ao longo dos 10 anos analisados. Neste caso, a assimetria dos dados é menos evidente. Chama-se a atenção para o fato dos times piores colocados, terem, em sua maioria, times mais velhos. Além disso, os times do Z4 costumam receber mais cartões amarelos e vermelhos do que a média geral.
+
+:::
+
+:::
+
+```{r, Acumulos, echo=FALSE, message=FALSE, warning=FALSE, render= FALSE, eval=F}
+#somar os pontos de cada time em cada ano 
+acumulados <- tibble (
+  Time = c(br_23$Time, br_22$Time, br_21$Time, br_20$Time, br_19$Time, br_18$Time, br_17$Time, br_16$Time, br_15$Time, br_14$Time),
+  Pontos = c(br_23$Pontos, br_22$Pontos, br_21$Pontos, br_20$Pontos, br_19$Pontos, br_18$Pontos, br_17$Pontos, br_16$Pontos, br_15$Pontos, br_14$Pontos),
+  Cartões_Amarelos = c(br_23_e$CrtsA, br_22_e$CrtsA, br_21_e$CrtsA, br_20_e$CrtsA, br_19_e$CrtsA, br_18_e$CrtsA, br_17_e$CrtsA, br_16_e$CrtsA, br_15_e$CrtsA, br_14_e$CrtsA),
+  Cartões_Vermelhos = c(br_23_e$CrtV, br_22_e$CrtV, br_21_e$CrtV, br_20_e$CrtV, br_19_e$CrtV, br_18_e$CrtV, br_17_e$CrtV, br_16_e$CrtV, br_15_e$CrtV, br_14_e$CrtV),
+  Média_Gols = c(br_23_e$'Gols...23', br_22_e$'Gols...23', br_21_e$'Gols...23', br_20_e$'Gols...23', br_19_e$'Gols...23', br_18_e$'Gols...17', br_17_e$'Gols...17', br_16_e$'Gols...17', br_15_e$'Gols...17', br_14_e$'Gols...17'),
+)
+# agrupar por time e somar os pontos, cartões amarelos e vermelhos e a média de gols
+pontos_acumulados <- pontos_acumulados |>
+  group_by(Time) |>
+  summarise(Pontos = sum(Pontos),
+            Cartões_Amarelos = sum(Cartões_Amarelos), 
+            Cartões_Vermelhos = sum(Cartões_Vermelhos), 
+            Média_Gols = mean(Média_Gols)) |> 
+  arrange(desc(Pontos)) 
+# tabela html com os times que mais acumularam pontos
+datatable(pontos_acumulados, rownames = FALSE)
+
+```
+
+# Posse de Bola
+
+::: {style="text-align: justify"}
+
+Vamos analisar a relação da posse de bola com outros fatores, como a quantidade de gols, de assistências, posição relativa na tabela, e a pontuação ao final de cada temporada. Para isso, vamos usar 180 observações, visto que o ano de 2014 não possui dados referentes a posse de bola das equipes. Assim, neste caso, o recorte temporal é dado de 2015 a 2023. Abaixo, pode-se observar o gráfico de dispersão da posse de bola com as demais estatisticas supracitadas. Os gráficos apontam para uma relação positiva entre a posse de bola e a quantidade de gols marcados, a quantidade de assistências, a posição relativa na tabela e a pontuação ao final da temporada. Além disso, abaixo encontra-se a tabela com os valores referentes ao coeficiente de correlação de Pearson entre a posse de bola e as demais variáveis.
+
+```{r, DataFrame Posse, echo=FALSE, message=FALSE, warning=FALSE}
+# Dataframe com a posse de bola e a quantidade de gols marcados por equipe
+posse_gols <- tibble(
+  posse = c(br_23_e$Posse, br_22_e$Posse, br_21_e$Posse, br_20_e$Posse, br_19_e$Posse, br_18_e$Posse, br_17_e$Posse, br_16_e$Posse, br_15_e$Posse),
+  gols = c(br_23_e$'Gols...9', br_22_e$'Gols...9', br_21_e$'Gols...9', br_20_e$'Gols...9', br_19_e$'Gols...9', br_18_e$'Gols...9', br_17_e$'Gols...9', br_16_e$'Gols...9', br_15_e$'Gols...9'),
+  equipe = c(br_23_e$Equipe, br_22_e$Equipe, br_21_e$Equipe, br_20_e$Equipe, br_19_e$Equipe, br_18_e$Equipe, br_17_e$Equipe, br_16_e$Equipe, br_15_e$Equipe),
+  ano = c(rep(2023, 20), rep(2022, 20), rep(2021, 20), rep(2020, 20), rep(2019, 20), rep(2018, 20), rep(2017, 20), rep(2016, 20), rep(2015, 20))
+)
+
+# Dataframe com a posse de bola e a quantidade de assistências por equipe
+posse_assistencias <- tibble(
+  posse = c(br_23_e$Posse, br_22_e$Posse, br_21_e$Posse, br_20_e$Posse, br_19_e$Posse, br_18_e$Posse, br_17_e$Posse, br_16_e$Posse, br_15_e$Posse),
+  assistencias = c(br_23_e$'Assis....10', br_22_e$'Assis....10', br_21_e$'Assis....10', br_20_e$'Assis....10', br_19_e$'Assis....10', br_18_e$'Assis....10', br_17_e$'Assis....10', br_16_e$'Assis....10', br_15_e$'Assis....10'),
+  equipe = c(br_23_e$Equipe, br_22_e$Equipe, br_21_e$Equipe, br_20_e$Equipe, br_19_e$Equipe, br_18_e$Equipe, br_17_e$Equipe, br_16_e$Equipe, br_15_e$Equipe),
+  ano = c(rep(2023, 20), rep(2022, 20), rep(2021, 20), rep(2020, 20), rep(2019, 20), rep(2018, 20), rep(2017, 20), rep(2016, 20), rep(2015, 20))
+)
+
+```
+
+```{r, Ordem Alfabética, echo=FALSE, message=FALSE, warning=FALSE}
+# Colocar a base de dados br_xx em ordem alfabetica a partir da coluna "Time"
+br_23 <- br_23[order(br_23$Time),]
+br_22 <- br_22[order(br_22$Time),]
+br_21 <- br_21[order(br_21$Time),]
+br_20 <- br_20[order(br_20$Time),]
+br_19 <- br_19[order(br_19$Time),]
+br_18 <- br_18[order(br_18$Time),]
+br_17 <- br_17[order(br_17$Time),]
+br_16 <- br_16[order(br_16$Time),]
+br_15 <- br_15[order(br_15$Time),]
+
+```
+
+```{r, dataframe Posição e pontos , echo=FALSE, message=FALSE, warning=FALSE}
+# Dataframe com a posse de bola e a posição relativa na tabela por equipe
+posse_posicao <- tibble(
+  posse = c(br_23_e$Posse, br_22_e$Posse, br_21_e$Posse, br_20_e$Posse, br_19_e$Posse, br_18_e$Posse, br_17_e$Posse, br_16_e$Posse, br_15_e$Posse),
+  posicao = c(br_23$"Classificação", br_22$"Classificação", br_21$"Classificação", br_20$"Classificação", br_19$"Classificação", br_18$"Classificação", br_17$"Classificação", br_16$"Classificação", br_15$"Classificação"),
+  equipe = c(br_23_e$Equipe, br_22_e$Equipe, br_21_e$Equipe, br_20_e$Equipe, br_19_e$Equipe, br_18_e$Equipe, br_17_e$Equipe, br_16_e$Equipe, br_15_e$Equipe),
+  ano = c(rep(2023, 20), rep(2022, 20), rep(2021, 20), rep(2020, 20), rep(2019, 20), rep(2018, 20), rep(2017, 20), rep(2016, 20), rep(2015, 20)))
+
+#Dataframe com a posse de bola e a quantidade de pontos por equipe
+posse_pontos <- tibble(
+  posse = c(br_23_e$Posse, br_22_e$Posse, br_21_e$Posse, br_20_e$Posse, br_19_e$Posse, br_18_e$Posse, br_17_e$Posse, br_16_e$Posse, br_15_e$Posse),
+  pontos = c(br_23$Pontos, br_22$Pontos, br_21$Pontos, br_20$Pontos, br_19$Pontos, br_18$Pontos, br_17$Pontos, br_16$Pontos, br_15$Pontos),
+  equipe = c(br_23_e$Equipe, br_22_e$Equipe, br_21_e$Equipe, br_20_e$Equipe, br_19_e$Equipe, br_18_e$Equipe, br_17_e$Equipe, br_16_e$Equipe, br_15_e$Equipe),
+  ano = c(rep(2023, 20), rep(2022, 20), rep(2021, 20), rep(2020, 20), rep(2019, 20), rep(2018, 20), rep(2017, 20), rep(2016, 20), rep(2015, 20))
+)
+```
+
+```{r, Graficos de Dispersão, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Gráfico de dispersão da posse de bola e a quantidade de gols marcados
+dis_posse_gols <- ggplot(posse_gols, aes(x = posse, y = gols)) +
+  geom_point(color = "skyblue") +
+  geom_smooth(method = "lm", se = T, color = "orangered") +
+  labs(title = "Posse de Bola x Gols Marcados",
+       x = "Posse de Bola",
+       y = "Gols Marcados") +
+  # marcar outliers
+  geom_point(data = posse_gols |> filter(gols > 70),color = "red", size = 2.5, shape = 21, stroke = 1 ) +
+  theme_minimal()
+
+dis_posse_assistencias <- ggplot(posse_assistencias, aes(x = posse, y = assistencias)) +
+  geom_point(color = "skyblue") +
+  geom_smooth(method = "lm", se = T, color = "orangered") +
+  labs(title = "Posse de Bola x Assistências",
+       x = "Posse de Bola",
+       y = "Assistências") +
+  geom_point(data = posse_assistencias |> filter(assistencias > 60),color = "red", size = 2.5, shape = 21, stroke = 1 ) +
+  theme_minimal()
+
+dis_posse_posicao <- ggplot(posse_posicao, aes(x = posse, y = posicao)) +
+  geom_point(color = "skyblue") +
+  geom_smooth(method = "lm", se = T, color = "orangered") +
+  labs(title = "Posse de Bola x Posição na Tabela",
+       x = "Posse de Bola",
+       y = "Posição na Tabela") +
+  geom_point(data = posse_posicao |> filter(posse_posicao$posse>61), color = "red", size = 2.5, shape = 21, stroke = 1)+
+  geom_point(data = posse_posicao |> filter(posse_posicao$posicao==5,posse_posicao$posse<42), color = "blue", size = 2.5, shape = 21, stroke = 1)+
+  theme_minimal()
+
+dis_posse_pontos <- ggplot(posse_pontos, aes(x = posse, y = pontos)) +
+  geom_point(color = "skyblue") +
+  geom_smooth(method = "lm", se = T, color = "orangered") +
+  labs(title = "Posse de Bola x Pontos",
+       x = "Posse de Bola",
+       y = "Pontos") +
+  geom_point(data=posse_pontos |> filter(pontos>87), color = 'red', size = 2.5, shape = 21, stroke = 1)+
+  theme_minimal()
+#grid.arrange(dis_posse_gols, dis_posse_assistencias, dis_posse_posicao,dis_posse_pontos, nrow = 2, ncol = 2)
+
+```
+
+::: panel-tabset
+Corelação entre a posse de bola e outras variáveis
+
+### Gols
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+print(dis_posse_gols)
+```
+
+Este primeiro gráfico mostra a relação entre a posse de bola e a quantidade de gols marcados pelas equipes. Pode-se observar uma relação positiva entre as duas variáveis, indicando que equipes com maior posse de bola tendem a marcar mais gols. O *autlier* marcado em vermelho representa a campanha de 2019 do Flamengo, em que foram marcados 85 gols, o que é um valor muito acima da média. 
+
+### Assistências
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+print(dis_posse_assistencias)
+```
+
+Este segundo gráfico mostra a relação entre a posse de bola e a quantidade de assistências realizadas pelas equipes. É considerado assistência o último passe antes de um gol feito por um companheiro de equipe, gols de penalti e de "rebote" não são considerados como assitências. Pode-se observar uma relação positiva entre as duas variáveis, indicando que equipes com maior posse de bola tendem a realizar mais assistências. O *autlier* marcado em vermelho representa a campanha de 2019 do Flamengo, em que foram realizadas 75 assistências de gols. 
+
+### Posição
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+print(dis_posse_posicao)
+```
+
+Este grafico mostra a relação entre a posse de bola e a posição relativa na tabela. Pode-se observar uma relação negativa entre as duas variáveis, indicando que equipes com maior posse de bola tendem a ocupar posições mais altas na tabela. Alem disso, neste caso, como os valores da posição so podem assumir valores interios de 1 a 20, a relação é mais clara. O valor marcado em vermelho representa a camapanha do Fluminense em 2023, evidenciando a o estilo de jogo do técnico Fernando Diniz, que prioriza a posse de bola mas sem muita objetividade. Já o valor marcado em azul representa a campanha do Botafogo(RJ) em 2018, que apesar de ter uma posse de bola baixa, conseguiu uma posição alta na tabela, destacando o trabalho do técnico José Ricardo, que é conhecido por jogar no erro do adversário, priorizando a defesa e o contra-ataque.
+
+### Pontos
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+print(dis_posse_pontos)
+```
+
+o quarto gráfico mostra a relação entre a posse de bola e a quantidade de pontos conquistados pelas equipes. Pode-se observar uma relação positiva entre as duas variáveis, indicando que equipes com maior posse de bola tendem a conquistar mais pontos. O *autlier* marcado em vermelho representa a campanha de 2019 do Flamengo, que conquistou 85 pontos, destacando mais uma vez a incrivel campanha do time na temporada. 
+
+### Matriz de Correlação
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+tabela_correlacao <- tibble(
+  " " = c("Posse de Bola x Gols Marcados", "Posse de Bola x Assistências", "Posse de Bola x Posição na Tabela", "Posse de Bola x Pontos"),
+  "Coeficiente de Correlação" = c(cor(posse_gols$posse, posse_gols$gols), cor(posse_assistencias$posse, posse_assistencias$assistencias), (cor(posse_posicao$posse, posse_posicao$posicao)*-1), cor(posse_pontos$posse, posse_pontos$pontos)))
+
+#kable(tabela_correlacao)
+
+correlacao <- cor(tibble(
+  "Posse de Bola" = c(br_23_e$Posse, br_22_e$Posse, br_21_e$Posse, br_20_e$Posse, br_19_e$Posse, br_18_e$Posse, br_17_e$Posse, br_16_e$Posse, br_15_e$Posse),
+  "Gols" = c(br_23_e$'Gols...9', br_22_e$'Gols...9', br_21_e$'Gols...9', br_20_e$'Gols...9', br_19_e$'Gols...9', br_18_e$'Gols...9', br_17_e$'Gols...9', br_16_e$'Gols...9', br_15_e$'Gols...9'),
+  "Assistências" = c(br_23_e$'Assis....10', br_22_e$'Assis....10', br_21_e$'Assis....10', br_20_e$'Assis....10', br_19_e$'Assis....10', br_18_e$'Assis....10', br_17_e$'Assis....10', br_16_e$'Assis....10', br_15_e$'Assis....10'),
+  "Posicao" = c(br_23$"Classificação", br_22$"Classificação", br_21$"Classificação", br_20$"Classificação", br_19$"Classificação", br_18$"Classificação", br_17$"Classificação", br_16$"Classificação", br_15$"Classificação"),
+  "Pontos" = c(br_23$Pontos, br_22$Pontos, br_21$Pontos, br_20$Pontos, br_19$Pontos, br_18$Pontos, br_17$Pontos, br_16$Pontos, br_15$Pontos))
+)
+
+corrplot(correlacao, method = 'number',type = "upper", tl.col = "black", col = COL2('RdBu'))
+```
+
+A matriz de correlação acima mostra os coeficientes de correlação de Pearson entre a posse de bola e as demais variáveis analisadas. Pode-se observar que a posse de bola tem uma correlação positiva com a quantidade de gols marcados e de assistências realizadas, e uma correlação negativa com a posição relativa na tabela. Além disso, a posse de bola tem uma correlação positiva com a quantidade de pontos conquistados pelas equipes. A matriz também mostra as correlações entre as demais variáveis onde pode-se observar que a menor correlação esta entre a posse de bola e o numero de assitências. Já a maior correlação se da pela posição na tabela e a quantidade de pontos acumulado. 
+
+:::
+
+:::
+# Referencias
+
+::: {panel-tabset}
+
+### Bibliografia
+Hadley Wickham, Garrett Grolemund. 2017. R for Data Science. [http://r4ds.had.co.nz/](http://r4ds.had.co.nz/)
+
+R Core Team (2021). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL [https://www.R-project.org/](https://www.R-project.org/).
+
+RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC, Boston, MA URL [http://www.rstudio.com/](http://www.rstudio.com/).
+
+Wickham, H. (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York. ISBN 978-3-319-24277-4, URL [https://ggplot2.tidyverse.org](https://ggplot2.tidyverse.org).
+
+Wickham, H., François, R., Henry, L., & Müller, K. (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.7. URL [https://CRAN.R-project.org/package=dplyr](https://CRAN.R-project.org/package=dplyr).
+FBREF - Sports Reference. URL [https://fbref.com/pt/](https://fbref.com/pt/)
+
+Campeonato Brasileiro de Futebol. URL [https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol](https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol)
+
+### Informações de sistema
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+sessioninfo::session_info()
+```
+
+
+:::
+
+
